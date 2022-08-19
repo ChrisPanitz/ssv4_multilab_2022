@@ -2,8 +2,8 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: July 2022
-# --- content: reading individual spectra and creating data frames for statistics & plots
+# --- script version: August 2022
+# --- content: reading individual spectra and creating data frames for statistics & plots (common pipeline)
 
 
 # Header Parameters -------------------------------------------------------
@@ -37,12 +37,12 @@ parentFolder <- here()
 
 # Creating Data Frame and Reading Data From Text Files For Stats ---------
 
-# create data frame with participant ID, site, condition variables and ssvep amp
+# create data frame with participant ID, lab, condition variables and ssvep amp
 df <- data.frame(
   part = character(),
-  site = factor(levels = c(1,2), labels = c("FL","LE")),
+  lab = factor(levels = c(1,2), labels = c("FL","LE")),
   freq = factor(levels = c(1,2,3), labels = c("6Hz","8.57Hz","15Hz")),
-  mod = factor(levels = c(1,2), labels = c("box","sine")),
+  mod = factor(levels = c(1,2), labels = c("square","sine")),
   ssvep = numeric()
 )
 
@@ -54,35 +54,35 @@ df <- data.frame(
 fileFolder <- paste0(parentFolder,"/individualSpectra/commonPipeline/")
 
 # for each condition, files in the folder are listed, values for participant ID,
-# site, condition, as well as the ssvep amplitude at predefined frequencies & channels
-list6box <- list.files(path = fileFolder, pattern = "6Hz_box")
-for (i in 1:length(list6box)) {
-  currData <- read.csv(paste0(fileFolder,list6box[i]), header = FALSE, sep = ",")
-  if (substr(list6box[i],1,2) == "FL") {
-    df[nrow(df)+1, 1:4] <- c(substr(list6box[i],1,5), substr(list6box[i],1,2), "6Hz", "box")
+# lab, condition, as well as the ssvep amplitude at predefined frequencies & channels
+list6sq <- list.files(path = fileFolder, pattern = "6Hz_square")
+for (i in 1:length(list6sq)) {
+  currData <- read.csv(paste0(fileFolder,list6sq[i]), header = FALSE, sep = ",")
+  if (substr(list6sq[i],1,2) == "FL") {
+    df[nrow(df)+1, 1:4] <- c(substr(list6sq[i],1,5), substr(list6sq[i],1,2), "6Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin6]))
-    if (exists("specMatFL6box")) {
-      specMatFL6box <- rbind(specMatFL6box, colMeans(currData[FLbinChn,]))
+    if (exists("specMatFL6sq")) {
+      specMatFL6sq <- rbind(specMatFL6sq, colMeans(currData[FLbinChn,]))
     } else {
-      specMatFL6box <- colMeans(currData[FLbinChn,])
+      specMatFL6sq <- colMeans(currData[FLbinChn,])
     }
-    if (exists("topoMatFL6box")) {
-      topoMatFL6box <- cbind(topoMatFL6box, colMeans(t(currData[,FLbin6])))
+    if (exists("topoMatFL6sq")) {
+      topoMatFL6sq <- cbind(topoMatFL6sq, colMeans(t(currData[,FLbin6])))
     } else {
-      topoMatFL6box <- colMeans(t(currData[,FLbin6]))
+      topoMatFL6sq <- colMeans(t(currData[,FLbin6]))
     }
-  } else if (substr(list6box[i],1,2) == "LE") {
-    df[nrow(df)+1, 1:4] <- c(substr(list6box[i],1,5), substr(list6box[i],1,2), "6Hz", "box")
+  } else if (substr(list6sq[i],1,2) == "LE") {
+    df[nrow(df)+1, 1:4] <- c(substr(list6sq[i],1,5), substr(list6sq[i],1,2), "6Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin6]))
-    if (exists("specMatLE6box")) {
-      specMatLE6box <- rbind(specMatLE6box, colMeans(currData[LEbinChn,]))
+    if (exists("specMatLE6sq")) {
+      specMatLE6sq <- rbind(specMatLE6sq, colMeans(currData[LEbinChn,]))
     } else {
-      specMatLE6box <- colMeans(currData[LEbinChn,])
+      specMatLE6sq <- colMeans(currData[LEbinChn,])
     }
-    if (exists("topoMatLE6box")) {
-      topoMatLE6box <- cbind(topoMatLE6box, colMeans(t(currData[,LEbin6])))
+    if (exists("topoMatLE6sq")) {
+      topoMatLE6sq <- cbind(topoMatLE6sq, colMeans(t(currData[,LEbin6])))
     } else {
-      topoMatLE6box <- colMeans(t(currData[,LEbin6]))
+      topoMatLE6sq <- colMeans(t(currData[,LEbin6]))
     }
   }
 }
@@ -119,34 +119,34 @@ for (i in 1:length(list6sin)) {
   }
 }
 
-list857box <- list.files(path = fileFolder, pattern = "8.57Hz_box")
-for (i in 1:length(list857box)) {
-  currData <- read.csv(paste0(fileFolder,list857box[i]), header = FALSE, sep = ",")
-  if (substr(list857box[i],1,2) == "FL") {
-    df[nrow(df)+1, 1:4] <- c(substr(list857box[i],1,5), substr(list857box[i],1,2), "8.57Hz", "box")
+list857sq <- list.files(path = fileFolder, pattern = "8.57Hz_square")
+for (i in 1:length(list857sq)) {
+  currData <- read.csv(paste0(fileFolder,list857sq[i]), header = FALSE, sep = ",")
+  if (substr(list857sq[i],1,2) == "FL") {
+    df[nrow(df)+1, 1:4] <- c(substr(list857sq[i],1,5), substr(list857sq[i],1,2), "8.57Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin857]))
-    if (exists("specMatFL857box")) {
-      specMatFL857box <- rbind(specMatFL857box, colMeans(currData[FLbinChn,]))
+    if (exists("specMatFL857sq")) {
+      specMatFL857sq <- rbind(specMatFL857sq, colMeans(currData[FLbinChn,]))
     } else {
-      specMatFL857box <- colMeans(currData[FLbinChn,])
+      specMatFL857sq <- colMeans(currData[FLbinChn,])
     }
-    if (exists("topoMatFL857box")) {
-      topoMatFL857box <- cbind(topoMatFL857box, colMeans(t(currData[,FLbin857])))
+    if (exists("topoMatFL857sq")) {
+      topoMatFL857sq <- cbind(topoMatFL857sq, colMeans(t(currData[,FLbin857])))
     } else {
-      topoMatFL857box <- colMeans(t(currData[,FLbin857]))
+      topoMatFL857sq <- colMeans(t(currData[,FLbin857]))
     }
-  } else if (substr(list857box[i],1,2) == "LE") {
-    df[nrow(df)+1, 1:4] <- c(substr(list857box[i],1,5), substr(list857box[i],1,2), "8.57Hz", "box")
+  } else if (substr(list857sq[i],1,2) == "LE") {
+    df[nrow(df)+1, 1:4] <- c(substr(list857sq[i],1,5), substr(list857sq[i],1,2), "8.57Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin857]))
-    if (exists("specMatLE857box")) {
-      specMatLE857box <- rbind(specMatLE857box, colMeans(currData[LEbinChn,]))
+    if (exists("specMatLE857sq")) {
+      specMatLE857sq <- rbind(specMatLE857sq, colMeans(currData[LEbinChn,]))
     } else {
-      specMatLE857box <- colMeans(currData[LEbinChn,])
+      specMatLE857sq <- colMeans(currData[LEbinChn,])
     }
-    if (exists("topoMatLE857box")) {
-      topoMatLE857box <- cbind(topoMatLE857box, colMeans(t(currData[,LEbin857])))
+    if (exists("topoMatLE857sq")) {
+      topoMatLE857sq <- cbind(topoMatLE857sq, colMeans(t(currData[,LEbin857])))
     } else {
-      topoMatLE857box <- colMeans(t(currData[,LEbin857]))
+      topoMatLE857sq <- colMeans(t(currData[,LEbin857]))
     }
   }
 }
@@ -183,34 +183,34 @@ for (i in 1:length(list857sin)) {
   }
 }
 
-list15box <- list.files(path = fileFolder, pattern = "15Hz_box")
-for (i in 1:length(list15box)) {
-  currData <- read.csv(paste0(fileFolder,list15box[i]), header = FALSE, sep = ",")
-  if (substr(list15box[i],1,2) == "FL") {
-    df[nrow(df)+1, 1:4] <- c(substr(list15box[i],1,5), substr(list15box[i],1,2), "15Hz", "box")
+list15sq <- list.files(path = fileFolder, pattern = "15Hz_square")
+for (i in 1:length(list15sq)) {
+  currData <- read.csv(paste0(fileFolder,list15sq[i]), header = FALSE, sep = ",")
+  if (substr(list15sq[i],1,2) == "FL") {
+    df[nrow(df)+1, 1:4] <- c(substr(list15sq[i],1,5), substr(list15sq[i],1,2), "15Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin15]))
-    if (exists("specMatFL15box")) {
-      specMatFL15box <- rbind(specMatFL15box, colMeans(currData[FLbinChn,]))
+    if (exists("specMatFL15sq")) {
+      specMatFL15sq <- rbind(specMatFL15sq, colMeans(currData[FLbinChn,]))
     } else {
-      specMatFL15box <- colMeans(currData[FLbinChn,])
+      specMatFL15sq <- colMeans(currData[FLbinChn,])
     }
-    if (exists("topoMatFL15box")) {
-      topoMatFL15box <- cbind(topoMatFL15box, colMeans(t(currData[,FLbin15])))
+    if (exists("topoMatFL15sq")) {
+      topoMatFL15sq <- cbind(topoMatFL15sq, colMeans(t(currData[,FLbin15])))
     } else {
-      topoMatFL15box <- colMeans(t(currData[,FLbin15]))
+      topoMatFL15sq <- colMeans(t(currData[,FLbin15]))
     }
-  } else if (substr(list15box[i],1,2) == "LE") {
-    df[nrow(df)+1, 1:4] <- c(substr(list15box[i],1,5), substr(list15box[i],1,2), "15Hz", "box")
+  } else if (substr(list15sq[i],1,2) == "LE") {
+    df[nrow(df)+1, 1:4] <- c(substr(list15sq[i],1,5), substr(list15sq[i],1,2), "15Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin15]))
-    if (exists("specMatLE15box")) {
-      specMatLE15box <- rbind(specMatLE15box, colMeans(currData[LEbinChn,]))
+    if (exists("specMatLE15sq")) {
+      specMatLE15sq <- rbind(specMatLE15sq, colMeans(currData[LEbinChn,]))
     } else {
-      specMatLE15box <- colMeans(currData[LEbinChn,])
+      specMatLE15sq <- colMeans(currData[LEbinChn,])
     }
-    if (exists("topoMatLE15box")) {
-      topoMatLE15box <- cbind(topoMatLE15box, colMeans(t(currData[,LEbin15])))
+    if (exists("topoMatLE15sq")) {
+      topoMatLE15sq <- cbind(topoMatLE15sq, colMeans(t(currData[,LEbin15])))
     } else {
-      topoMatLE15box <- colMeans(t(currData[,LEbin15]))
+      topoMatLE15sq <- colMeans(t(currData[,LEbin15]))
     }
   }
 }
@@ -253,15 +253,15 @@ for (i in 1:length(list15sin)) {
 
 # Finishing Touches & Saving Stats Data Frame -----------------------------
 
-# transform participant variable into factor and rename factor levels for site
+# transform participant variable into factor and rename factor levels for lab
 df$part <- factor(df$part)
-levels(df$site) <- c("Florida","Leipzig")
+levels(df$lab) <- c("Florida","Leipzig")
 
-# z-standardize ssvep amplitudes into new variable, separately for sites
-df$ssvepZ[df$site == "Florida"] <- (df$ssvep[df$site == "Florida"] - mean(df$ssvep[df$site == "Florida"])) / 
-                                      sd(df$ssvep[df$site == "Florida"])
-df$ssvepZ[df$site == "Leipzig"] <- (df$ssvep[df$site == "Leipzig"] - mean(df$ssvep[df$site == "Leipzig"])) / 
-                                      sd(df$ssvep[df$site == "Leipzig"])
+# z-standardize ssvep amplitudes into new variable, separately for labs
+df$ssvepZ[df$lab == "Florida"] <- (df$ssvep[df$lab == "Florida"] - mean(df$ssvep[df$lab == "Florida"])) / 
+                                      sd(df$ssvep[df$lab == "Florida"])
+df$ssvepZ[df$lab == "Leipzig"] <- (df$ssvep[df$lab == "Leipzig"] - mean(df$ssvep[df$lab == "Leipzig"])) / 
+                                      sd(df$ssvep[df$lab == "Leipzig"])
 
 # save data frame in subflder for data frames
 savename = paste0(parentFolder,"/dataframes/dfSSVEP_commPL.csv")
@@ -271,63 +271,63 @@ write.csv(x = df, savename, row.names = FALSE)
 
 # Averaging Individual Spectra and Creating Data Frame for Plotting -------
 
-# Averaging individual spectra, separately for and across sites
-specAvgFL6box <- colMeans(specMatFL6box)
+# Averaging individual spectra, separately for and across labs
+specAvgFL6sq <- colMeans(specMatFL6sq)
 specAvgFL6sin <- colMeans(specMatFL6sin)
-specAvgFL857box <- colMeans(specMatFL857box)
+specAvgFL857sq <- colMeans(specMatFL857sq)
 specAvgFL857sin <- colMeans(specMatFL857sin)
-specAvgFL15box <- colMeans(specMatFL15box)
+specAvgFL15sq <- colMeans(specMatFL15sq)
 specAvgFL15sin <- colMeans(specMatFL15sin)
-specAvgLE6box <- colMeans(specMatLE6box)
+specAvgLE6sq <- colMeans(specMatLE6sq)
 specAvgLE6sin <- colMeans(specMatLE6sin)
-specAvgLE857box <- colMeans(specMatLE857box)
+specAvgLE857sq <- colMeans(specMatLE857sq)
 specAvgLE857sin <- colMeans(specMatLE857sin)
-specAvgLE15box <- colMeans(specMatLE15box)
+specAvgLE15sq <- colMeans(specMatLE15sq)
 specAvgLE15sin <- colMeans(specMatLE15sin)
-specAvg6box <- colMeans(rbind(specMatFL6box,specMatLE6box))
+specAvg6sq <- colMeans(rbind(specMatFL6sq,specMatLE6sq))
 specAvg6sin <- colMeans(rbind(specMatFL6sin,specMatLE6sin))
-specAvg857box <- colMeans(rbind(specMatFL857box,specMatLE857box))
+specAvg857sq <- colMeans(rbind(specMatFL857sq,specMatLE857sq))
 specAvg857sin <- colMeans(rbind(specMatFL857sin,specMatLE857sin))
-specAvg15box <- colMeans(rbind(specMatFL15box,specMatLE15box))
+specAvg15sq <- colMeans(rbind(specMatFL15sq,specMatLE15sq))
 specAvg15sin <- colMeans(rbind(specMatFL15sin,specMatLE15sin))
 
-# number of frequncy bins, separate for site
-nrBinsFL = length(specAvgFL6box)
-nrBinsLE = length(specAvgLE6box)
+# number of frequncy bins, separate for lab
+nrBinsFL = length(specAvgFL6sq)
+nrBinsLE = length(specAvgLE6sq)
 
-# Create data frame with factors site, driving frequency & modulation function, 
+# Create data frame with factors lab, driving frequency & modulation function, 
 # as well as frequency bin (x axis) and spectral amplitude (y axis)
 dfSpectra <- data.frame(
-  site = factor(c(rep(1, 6*nrBinsFL), rep(2, 6*nrBinsLE)),
+  lab = factor(c(rep(1, 6*nrBinsFL), rep(2, 6*nrBinsLE)),
                   levels = c(1,2), labels = c("Florida","Leipzig")),
   freq = factor(c(rep(1, 2*nrBinsFL), rep(2, 2*nrBinsFL), rep(3, 2*nrBinsFL),
                   rep(1, 2*nrBinsLE), rep(2, 2*nrBinsLE), rep(3, 2*nrBinsLE)),
                 levels = c(1,2,3), labels = c("6Hz", "8.57Hz", "15Hz")),
   mod = factor(c(rep(c(rep(1, nrBinsFL), rep(2, nrBinsFL)),3),
                  rep(c(rep(1, nrBinsLE), rep(2, nrBinsLE)),3)),
-               levels = c(1,2), labels = c("box", "sine")),
+               levels = c(1,2), labels = c("square", "sine")),
   freqBin = c(rep(seq(0, (nrBinsFL-1) * freqResFL, freqResFL), 6),
               rep(seq(0, (nrBinsLE-1) * freqResLE, freqResLE), 6)),
-  amp = c(specAvgFL6box, specAvgFL6sin, specAvgFL857box, specAvgFL857sin, specAvgFL15box, specAvgFL15sin,
-          specAvgLE6box, specAvgLE6sin, specAvgLE857box, specAvgLE857sin, specAvgLE15box, specAvgLE15sin)
+  amp = c(specAvgFL6sq, specAvgFL6sin, specAvgFL857sq, specAvgFL857sin, specAvgFL15sq, specAvgFL15sin,
+          specAvgLE6sq, specAvgLE6sin, specAvgLE857sq, specAvgLE857sin, specAvgLE15sq, specAvgLE15sin)
 )
 
 # Create data frame with factors driving frequency & modulation function, 
-# as well as frequency bin (x axis) and spectral amplitude (y axis) - across sites
+# as well as frequency bin (x axis) and spectral amplitude (y axis) - across labs
 dfSpectraJoint <- data.frame(
   freq = factor(c(rep(1, 2*nrBinsFL), rep(2, 2*nrBinsFL), rep(3, 2*nrBinsFL)),
                 levels = c(1,2,3), labels = c("6Hz", "8.57Hz", "15Hz")),
   mod = factor(c(rep(c(rep(1, nrBinsFL), rep(2, nrBinsFL)),3)),
-               levels = c(1,2), labels = c("box", "sine")),
+               levels = c(1,2), labels = c("square", "sine")),
   freqBin = c(rep(seq(0, (nrBinsFL-1) * freqResFL, freqResFL), 6)),
-  amp = c(specAvg6box, specAvg6sin, specAvg857box, specAvg857sin, specAvg15box, specAvg15sin)
+  amp = c(specAvg6sq, specAvg6sin, specAvg857sq, specAvg857sin, specAvg15sq, specAvg15sin)
 )
 
 # Save data frames
 savename = paste0(parentFolder,"/dataframes/dfSpectra_commPL.csv")
 write.csv(x = dfSpectra, savename, row.names = FALSE)
 
-savename = paste0(parentFolder,"/dataframes/dfSpectra_commPL_jointSites.csv")
+savename = paste0(parentFolder,"/dataframes/dfSpectra_commPL_jointLabs.csv")
 write.csv(x = dfSpectraJoint, savename, row.names = FALSE)
 
 
@@ -350,39 +350,39 @@ chanLocsLE$x <- chanLocsLE$radius*sin(chanLocsLE$thetaRadian)*200
 chanLocsLE$y <- chanLocsLE$radius*cos(chanLocsLE$thetaRadian)*200
 
 # Average individual amplitudes across whole sample
-topoAvgFL6box <- rowMeans(topoMatFL6box)
+topoAvgFL6sq <- rowMeans(topoMatFL6sq)
 topoAvgFL6sin <- rowMeans(topoMatFL6sin)
-topoAvgFL857box <- rowMeans(topoMatFL857box)
+topoAvgFL857sq <- rowMeans(topoMatFL857sq)
 topoAvgFL857sin <- rowMeans(topoMatFL857sin)
-topoAvgFL15box <- rowMeans(topoMatFL15box)
+topoAvgFL15sq <- rowMeans(topoMatFL15sq)
 topoAvgFL15sin <- rowMeans(topoMatFL15sin)
-topoAvgLE6box <- rowMeans(topoMatLE6box)
+topoAvgLE6sq <- rowMeans(topoMatLE6sq)
 topoAvgLE6sin <- rowMeans(topoMatLE6sin)
-topoAvgLE857box <- rowMeans(topoMatLE857box)
+topoAvgLE857sq <- rowMeans(topoMatLE857sq)
 topoAvgLE857sin <- rowMeans(topoMatLE857sin)
-topoAvgLE15box <- rowMeans(topoMatLE15box)
+topoAvgLE15sq <- rowMeans(topoMatLE15sq)
 topoAvgLE15sin <- rowMeans(topoMatLE15sin)
 
-# number of electrodes, separate for site
-nrChansFL = length(topoAvgFL6box)
-nrChansLE = length(topoAvgLE6box)
+# number of electrodes, separate for lab
+nrChansFL = length(topoAvgFL6sq)
+nrChansLE = length(topoAvgLE6sq)
 
-# Create data frame with factors site, driving frequency & modulation function, 
+# Create data frame with factors lab, driving frequency & modulation function, 
 # electrode name, x & y coordinates for plot & ssVEP amplitude
 dfTopos <- data.frame(
-  site = factor(c(rep(1, 6*nrChansFL), rep(2, 6*nrChansLE)),
+  lab = factor(c(rep(1, 6*nrChansFL), rep(2, 6*nrChansLE)),
                 levels = c(1,2), labels = c("Florida","Leipzig")),
   freq = factor(c(rep(1, 2*nrChansFL), rep(2, 2*nrChansFL), rep(3, 2*nrChansFL),
                   rep(1, 2*nrChansLE), rep(2, 2*nrChansLE), rep(3, 2*nrChansLE)),
                 levels = c(1,2,3), labels = c("6Hz", "8.57Hz", "15Hz")),
   mod = factor(c(rep(c(rep(1, nrChansFL), rep(2, nrChansFL)),3),
                  rep(c(rep(1, nrChansLE), rep(2, nrChansLE)),3)),
-               levels = c(1,2), labels = c("box", "sine")),
+               levels = c(1,2), labels = c("square", "sine")),
   electrode = c(rep(chanLocsFL$name, 6), rep(chanLocsLE$name, 6)),
   x = c(rep(chanLocsFL$x, 6), rep(chanLocsLE$x, 6)),
   y = c(rep(chanLocsFL$y, 6), rep(chanLocsLE$y, 6)),
-  amplitude = c(topoAvgFL6box, topoAvgFL6sin, topoAvgFL857box, topoAvgFL857sin, topoAvgFL15box, topoAvgFL15sin,
-                topoAvgLE6box, topoAvgLE6sin, topoAvgLE857box, topoAvgLE857sin, topoAvgLE15box, topoAvgLE15sin)
+  amplitude = c(topoAvgFL6sq, topoAvgFL6sin, topoAvgFL857sq, topoAvgFL857sin, topoAvgFL15sq, topoAvgFL15sin,
+                topoAvgLE6sq, topoAvgLE6sin, topoAvgLE857sq, topoAvgLE857sin, topoAvgLE15sq, topoAvgLE15sin)
 )
 
 # save topo dataframe

@@ -2,8 +2,8 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: July 2022
-# --- content: ANOVAs for ssVEP data based on common FFT pipeline
+# --- script version: August 2022
+# --- content: ANOVAs for ssVEP data based (common pipeline)
 
 
 # Loading Packages, Setting Path & Random Number Generator Seed -----------
@@ -29,9 +29,9 @@ rngSeed <- 249336527
 loadname <- paste0(parentFolder,"/dataframes/dfSSVEP_commPL.csv")
 df <- read.csv(loadname)
 df$part <- factor(df$part)
-df$site <- factor(df$site, levels = c("Florida","Leipzig"), labels = c("Florida","Leipzig"))
+df$lab <- factor(df$lab, levels = c("Florida","Leipzig"), labels = c("Florida","Leipzig"))
 df$freq <- factor(df$freq, levels = c("6Hz","8.57Hz","15Hz"), labels = c("6Hz","8.57Hz","15Hz"))
-df$mod = factor(df$mod, levels = c("box","sine"), labels = c("box","sine"))
+df$mod = factor(df$mod, levels = c("square","sine"), labels = c("square","sine"))
 
 
 
@@ -43,7 +43,7 @@ anovaSSVEP <- anova_test(
   dv = ssvepZ,
   wid = part,
   within = c(freq, mod),
-  between = site,
+  between = lab,
   type = 3,
   effect.size = "pes",
   detailed = TRUE
@@ -54,19 +54,19 @@ plotSSVEP <- ezPlot(
   dv = ssvepZ,
   wid = part,
   within = .(freq, mod),
-  between = .(site),
+  between = .(lab),
   x = freq,
   split = mod,
-  col = site
+  col = lab
 ); plotSSVEP
 
 
 
 # Bayesian ANOVA ----------------------------------------------------------
 
-# Bayesian Frequency x Modulation x site ANOVA on z-standardized ssvep amplitudes
+# Bayesian Frequency x Modulation x lab ANOVA on z-standardized ssvep amplitudes
 set.seed(rngSeed); bayAnovaSSVEP <- anovaBF(
-                                    formula = ssvepZ ~ freq*mod*site + part,
+                                    formula = ssvepZ ~ freq*mod*lab + part,
                                     data = df,
                                     whichRandom = "part",
                                     whichModels = "all",
