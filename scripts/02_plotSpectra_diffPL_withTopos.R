@@ -58,7 +58,7 @@ specFL6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq =
            width = resFL, alpha = .80) +
   #geom_vline(xintercept = 6, color = "gray70", linetype = "dashed", size = .2) +
   scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = "Normalized spectral amplitude", limits = c(yminFL,ymaxFL)) +
+  scale_y_continuous(name = "Spectral amplitude (µV/Hz)", limits = c(yminFL,ymaxFL)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
   labs(title = "Florida - 6 Hz") +
   theme(
@@ -138,7 +138,7 @@ specLE6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq =
             alpha = .80) +
   #geom_vline(xintercept = 6, color = "gray70", linetype = "dashed", size = .2) +
   scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = "Spectral amplitude (µV)", limits = c(yminLE,ymaxLE)) +
+  scale_y_continuous(name = "Spectral amplitude (µV/cm^2)", limits = c(yminLE,ymaxLE)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
   labs(title = "Leipzig - 6 Hz") +
   theme(
