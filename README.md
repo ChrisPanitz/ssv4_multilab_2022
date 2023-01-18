@@ -13,3 +13,4 @@ data and R code for analyses
 - figures: R-generated figures in pdf and jpg format
 - individualSpectra: spectra for each participant, condition, and channel
 - scripts: R scripts
+- supplementaryData: data for supplementary analyses, including Hilbert transforms, phase-locking, single-trial amplitude/SNR data across trials, and control analysis for Gender (common pipeline analysis)
