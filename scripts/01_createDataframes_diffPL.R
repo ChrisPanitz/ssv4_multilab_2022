@@ -2,7 +2,7 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
+# --- script version: December 2022
 # --- content: reading individual spectra and creating data frames for statistics & plots
 
 
@@ -10,16 +10,16 @@
 
 # indices in spectrum data matrices
 # Florida: single bin at driving frequency, at Oz
-FLbin6 <- 15
-FLbin857 <- 21
-FLbin15 <- 36
+FLbin6 <- 15 # indices of harmonics: 1f => 15, 2f => 29, bin(xf) = 1 + 14x
+FLbin857 <- 21 # indices of harmonics: 1f => 21, 2f => 41, bin(xf) = 1 + 20x
+FLbin15 <- 36 # indices of harmonics: 1f => 36, 2f => 71, bin(xf) = 1 + 35x
 FLbinChn <- 75
 freqResFL <- 3/7
 
 # Leipzig: mean in range of frequency bins (~ driving frequency +/- 0.1 Hz), at Oz & Iz
-LEbin6 <- 379:391
-LEbin857 <- 543:556
-LEbin15 <- 955:967
+LEbin6 <- 379:391 # indices of harmonics: 1f => 379:391, 2f => 763:391, bins(xf) = -5 + 384x : 7 + 384x
+LEbin857 <- 543:556 # indices of harmonics: 1f => 543:556, 2f => 1091:1104, bins(xf) = -5 + 548x : 8 + 548x
+LEbin15 <- 955:967 # indices of harmonics: 1f => 955:967, 2f => 29, bins(xf) = -5 + 960x : 7 + 960x
 LEbinChn <- c(28,29)
 freqResLE <- 1/64
 

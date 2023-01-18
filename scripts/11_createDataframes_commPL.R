@@ -2,26 +2,32 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
+# --- script version: December 2022
 # --- content: reading individual spectra and creating data frames for statistics & plots (common pipeline)
 
 
 # Header Parameters -------------------------------------------------------
 
 # indices in spectrum data matrices
-# Florida: single bin at driving frequency, at Oz
-FLbin6 <- 15
-FLbin857 <- 21
-FLbin15 <- 36
+# Florida: single bin at driving frequency, at Oz & Iz
+FLbin6 <- 15 # indices of harmonics: 1f => 15, 2f => 29, bin(xf) = 1 + 14x
+FLbin857 <- 21 # indices of harmonics: 1f => 21, 2f => 41, bin(xf) = 1 + 20x
+FLbin15 <- 36 # indices of harmonics: 1f => 36, 2f => 71, bin(xf) = 1 + 35x
 FLbinChn <- c(75,81)
 freqResFL <- 3/7
+FLnoise6 <- c(11,12,13,17,18,19)
+FLnoise857 <- c(17,18,19,23,24,25)
+FLnoise15 <- c(32,33,34,38,39,40)
 
-# Leipzig: mean in range of frequency bins (~ driving frequency +/- 0.1 Hz), at Oz & Iz
-LEbin6 <- 15
-LEbin857 <- 21
-LEbin15 <- 36
+# Leipzig: single bin at driving frequency, at Oz & Iz
+LEbin6 <- 15 # indices of harmonics: 1f => 15, 2f => 29, bin(xf) = 1 + 14x
+LEbin857 <- 21 # indices of harmonics: 1f => 21, 2f => 41, bin(xf) = 1 + 20x
+LEbin15 <- 36 # indices of harmonics: 1f => 36, 2f => 71, bin(xf) = 1 + 35x
 LEbinChn <- c(28,29)
 freqResLE <- 3/7
+LEnoise6 <- c(11,12,13,17,18,19)
+LEnoise857 <- c(17,18,19,23,24,25)
+LEnoise15 <- c(32,33,34,38,39,40)
 
 
 
@@ -61,6 +67,7 @@ for (i in 1:length(list6sq)) {
   if (substr(list6sq[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list6sq[i],1,5), substr(list6sq[i],1,2), "6Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin6]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin6])) / mean(as.matrix(currData[FLbinChn,FLnoise6]))
     if (exists("specMatFL6sq")) {
       specMatFL6sq <- rbind(specMatFL6sq, colMeans(currData[FLbinChn,]))
     } else {
@@ -68,12 +75,15 @@ for (i in 1:length(list6sq)) {
     }
     if (exists("topoMatFL6sq")) {
       topoMatFL6sq <- cbind(topoMatFL6sq, colMeans(t(currData[,FLbin6])))
+      topoMatFL6sqSNR <- cbind(topoMatFL6sqSNR, colMeans(t(currData[,FLbin6]))/colMeans(t(currData[,FLnoise6])))
     } else {
       topoMatFL6sq <- colMeans(t(currData[,FLbin6]))
+      topoMatFL6sqSNR <- colMeans(t(currData[,FLbin6]))/colMeans(t(currData[,FLnoise6]))
     }
   } else if (substr(list6sq[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list6sq[i],1,5), substr(list6sq[i],1,2), "6Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin6]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin6])) / mean(as.matrix(currData[LEbinChn,LEnoise6]))
     if (exists("specMatLE6sq")) {
       specMatLE6sq <- rbind(specMatLE6sq, colMeans(currData[LEbinChn,]))
     } else {
@@ -81,8 +91,10 @@ for (i in 1:length(list6sq)) {
     }
     if (exists("topoMatLE6sq")) {
       topoMatLE6sq <- cbind(topoMatLE6sq, colMeans(t(currData[,LEbin6])))
+      topoMatLE6sqSNR <- cbind(topoMatLE6sqSNR, colMeans(t(currData[,LEbin6]))/colMeans(t(currData[,LEnoise6])))
     } else {
       topoMatLE6sq <- colMeans(t(currData[,LEbin6]))
+      topoMatLE6sqSNR <- colMeans(t(currData[,LEbin6]))/colMeans(t(currData[,LEnoise6]))
     }
   }
 }
@@ -93,6 +105,7 @@ for (i in 1:length(list6sin)) {
   if (substr(list6sin[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list6sin[i],1,5), substr(list6sin[i],1,2), "6Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin6]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin6])) / mean(as.matrix(currData[FLbinChn,FLnoise6]))
     if (exists("specMatFL6sin")) {
       specMatFL6sin <- rbind(specMatFL6sin, colMeans(currData[FLbinChn,]))
     } else {
@@ -100,12 +113,15 @@ for (i in 1:length(list6sin)) {
     }
     if (exists("topoMatFL6sin")) {
       topoMatFL6sin <- cbind(topoMatFL6sin, colMeans(t(currData[,FLbin6])))
+      topoMatFL6sinSNR <- cbind(topoMatFL6sinSNR, colMeans(t(currData[,FLbin6]))/colMeans(t(currData[,FLnoise6])))
     } else {
       topoMatFL6sin <- colMeans(t(currData[,FLbin6]))
+      topoMatFL6sinSNR <- colMeans(t(currData[,FLbin6]))/colMeans(t(currData[,FLnoise6]))
     }
   } else if (substr(list6sin[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list6sin[i],1,5), substr(list6sin[i],1,2), "6Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin6]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin6])) / mean(as.matrix(currData[LEbinChn,LEnoise6]))
     if (exists("specMatLE6sin")) {
       specMatLE6sin <- rbind(specMatLE6sin, colMeans(currData[LEbinChn,]))
     } else {
@@ -113,8 +129,10 @@ for (i in 1:length(list6sin)) {
     }
     if (exists("topoMatLE6sin")) {
       topoMatLE6sin <- cbind(topoMatLE6sin, colMeans(t(currData[,LEbin6])))
+      topoMatLE6sinSNR <- cbind(topoMatLE6sinSNR, colMeans(t(currData[,LEbin6]))/colMeans(t(currData[,LEnoise6])))
     } else {
       topoMatLE6sin <- colMeans(t(currData[,LEbin6]))
+      topoMatLE6sinSNR <- colMeans(t(currData[,LEbin6]))/colMeans(t(currData[,LEnoise6]))
     }
   }
 }
@@ -125,19 +143,23 @@ for (i in 1:length(list857sq)) {
   if (substr(list857sq[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list857sq[i],1,5), substr(list857sq[i],1,2), "8.57Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin857]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin857])) / mean(as.matrix(currData[FLbinChn,FLnoise857]))
     if (exists("specMatFL857sq")) {
       specMatFL857sq <- rbind(specMatFL857sq, colMeans(currData[FLbinChn,]))
     } else {
       specMatFL857sq <- colMeans(currData[FLbinChn,])
     }
     if (exists("topoMatFL857sq")) {
-      topoMatFL857sq <- cbind(topoMatFL857sq, colMeans(t(currData[,FLbin857])))
+      topoMatFL857sq <- cbind(topoMatFL857sq, colMeans(t(currData[,FLbin857])))#
+      topoMatFL857sqSNR <- cbind(topoMatFL857sqSNR, colMeans(t(currData[,FLbin857]))/colMeans(t(currData[,FLnoise857])))
     } else {
       topoMatFL857sq <- colMeans(t(currData[,FLbin857]))
+      topoMatFL857sqSNR <- colMeans(t(currData[,FLbin857]))/colMeans(t(currData[,FLnoise857]))
     }
   } else if (substr(list857sq[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list857sq[i],1,5), substr(list857sq[i],1,2), "8.57Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin857]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin857])) / mean(as.matrix(currData[LEbinChn,LEnoise857]))
     if (exists("specMatLE857sq")) {
       specMatLE857sq <- rbind(specMatLE857sq, colMeans(currData[LEbinChn,]))
     } else {
@@ -145,8 +167,10 @@ for (i in 1:length(list857sq)) {
     }
     if (exists("topoMatLE857sq")) {
       topoMatLE857sq <- cbind(topoMatLE857sq, colMeans(t(currData[,LEbin857])))
+      topoMatLE857sqSNR <- cbind(topoMatLE857sqSNR, colMeans(t(currData[,LEbin857]))/colMeans(t(currData[,LEnoise857])))
     } else {
       topoMatLE857sq <- colMeans(t(currData[,LEbin857]))
+      topoMatLE857sqSNR <- colMeans(t(currData[,LEbin857]))/colMeans(t(currData[,LEnoise857]))
     }
   }
 }
@@ -157,6 +181,7 @@ for (i in 1:length(list857sin)) {
   if (substr(list857sin[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list857sin[i],1,5), substr(list857sin[i],1,2), "8.57Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin857]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin857])) / mean(as.matrix(currData[FLbinChn,FLnoise857]))
     if (exists("specMatFL857sin")) {
       specMatFL857sin <- rbind(specMatFL857sin, colMeans(currData[FLbinChn,]))
     } else {
@@ -164,12 +189,15 @@ for (i in 1:length(list857sin)) {
     }
     if (exists("topoMatFL857sin")) {
       topoMatFL857sin <- cbind(topoMatFL857sin, colMeans(t(currData[,FLbin857])))
+      topoMatFL857sinSNR <- cbind(topoMatFL857sinSNR, colMeans(t(currData[,FLbin857]))/colMeans(t(currData[,FLnoise857])))
     } else {
       topoMatFL857sin <- colMeans(t(currData[,FLbin857]))
+      topoMatFL857sinSNR <- colMeans(t(currData[,FLbin857]))/colMeans(t(currData[,FLnoise857]))
     }
   } else if (substr(list857sin[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list857sin[i],1,5), substr(list857sin[i],1,2), "8.57Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin857]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin857])) / mean(as.matrix(currData[LEbinChn,LEnoise857]))
     if (exists("specMatLE857sin")) {
       specMatLE857sin <- rbind(specMatLE857sin, colMeans(currData[LEbinChn,]))
     } else {
@@ -177,8 +205,10 @@ for (i in 1:length(list857sin)) {
     }
     if (exists("topoMatLE857sin")) {
       topoMatLE857sin <- cbind(topoMatLE857sin, colMeans(t(currData[,LEbin857])))
+      topoMatLE857sinSNR <- cbind(topoMatLE857sinSNR, colMeans(t(currData[,LEbin857]))/colMeans(t(currData[,LEnoise857])))
     } else {
       topoMatLE857sin <- colMeans(t(currData[,LEbin857]))
+      topoMatLE857sinSNR <- colMeans(t(currData[,LEbin857]))/colMeans(t(currData[,LEnoise857]))
     }
   }
 }
@@ -189,6 +219,7 @@ for (i in 1:length(list15sq)) {
   if (substr(list15sq[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list15sq[i],1,5), substr(list15sq[i],1,2), "15Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin15]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin15])) / mean(as.matrix(currData[FLbinChn,FLnoise15]))
     if (exists("specMatFL15sq")) {
       specMatFL15sq <- rbind(specMatFL15sq, colMeans(currData[FLbinChn,]))
     } else {
@@ -196,12 +227,15 @@ for (i in 1:length(list15sq)) {
     }
     if (exists("topoMatFL15sq")) {
       topoMatFL15sq <- cbind(topoMatFL15sq, colMeans(t(currData[,FLbin15])))
+      topoMatFL15sqSNR <- cbind(topoMatFL15sqSNR, colMeans(t(currData[,FLbin15]))/colMeans(t(currData[,FLnoise15])))
     } else {
       topoMatFL15sq <- colMeans(t(currData[,FLbin15]))
+      topoMatFL15sqSNR <- colMeans(t(currData[,FLbin15]))/colMeans(t(currData[,FLnoise15]))
     }
   } else if (substr(list15sq[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list15sq[i],1,5), substr(list15sq[i],1,2), "15Hz", "square")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin15]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin15])) / mean(as.matrix(currData[LEbinChn,LEnoise15]))
     if (exists("specMatLE15sq")) {
       specMatLE15sq <- rbind(specMatLE15sq, colMeans(currData[LEbinChn,]))
     } else {
@@ -209,8 +243,10 @@ for (i in 1:length(list15sq)) {
     }
     if (exists("topoMatLE15sq")) {
       topoMatLE15sq <- cbind(topoMatLE15sq, colMeans(t(currData[,LEbin15])))
+      topoMatLE15sqSNR <- cbind(topoMatLE15sqSNR, colMeans(t(currData[,LEbin15]))/colMeans(t(currData[,LEnoise15])))
     } else {
       topoMatLE15sq <- colMeans(t(currData[,LEbin15]))
+      topoMatLE15sqSNR <- colMeans(t(currData[,LEbin15]))/colMeans(t(currData[,LEnoise15]))
     }
   }
 }
@@ -221,6 +257,7 @@ for (i in 1:length(list15sin)) {
   if (substr(list15sin[i],1,2) == "FL") {
     df[nrow(df)+1, 1:4] <- c(substr(list15sin[i],1,5), substr(list15sin[i],1,2), "15Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin15]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[FLbinChn,FLbin15])) / mean(as.matrix(currData[FLbinChn,FLnoise15]))
     if (exists("specMatFL15sin")) {
       specMatFL15sin <- rbind(specMatFL15sin, colMeans(currData[FLbinChn,]))
     } else {
@@ -228,12 +265,15 @@ for (i in 1:length(list15sin)) {
     }
     if (exists("topoMatFL15sin")) {
       topoMatFL15sin <- cbind(topoMatFL15sin, colMeans(t(currData[,FLbin15])))
+      topoMatFL15sinSNR <- cbind(topoMatFL15sinSNR, colMeans(t(currData[,FLbin15]))/colMeans(t(currData[,FLnoise15])))
     } else {
       topoMatFL15sin <- colMeans(t(currData[,FLbin15]))
+      topoMatFL15sinSNR <- colMeans(t(currData[,FLbin15]))/colMeans(t(currData[,FLnoise15]))
     }
   } else if (substr(list15sin[i],1,2) == "LE") {
     df[nrow(df)+1, 1:4] <- c(substr(list15sin[i],1,5), substr(list15sin[i],1,2), "15Hz", "sine")
     df$ssvep[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin15]))
+    df$ssvepSNR[nrow(df)] <- mean(as.matrix(currData[LEbinChn,LEbin15])) / mean(as.matrix(currData[LEbinChn,LEnoise15]))
     if (exists("specMatLE15sin")) {
       specMatLE15sin <- rbind(specMatLE15sin, colMeans(currData[LEbinChn,]))
     } else {
@@ -241,8 +281,10 @@ for (i in 1:length(list15sin)) {
     }
     if (exists("topoMatLE15sin")) {
       topoMatLE15sin <- cbind(topoMatLE15sin, colMeans(t(currData[,LEbin15])))
+      topoMatLE15sinSNR <- cbind(topoMatLE15sinSNR, colMeans(t(currData[,LEbin15]))/colMeans(t(currData[,LEnoise15])))
     } else {
       topoMatLE15sin <- colMeans(t(currData[,LEbin15]))
+      topoMatLE15sinSNR <- colMeans(t(currData[,LEbin15]))/colMeans(t(currData[,LEnoise15]))
     }
   }
 }
@@ -262,6 +304,10 @@ df$ssvepZ[df$lab == "Florida"] <- (df$ssvep[df$lab == "Florida"] - mean(df$ssvep
                                       sd(df$ssvep[df$lab == "Florida"])
 df$ssvepZ[df$lab == "Leipzig"] <- (df$ssvep[df$lab == "Leipzig"] - mean(df$ssvep[df$lab == "Leipzig"])) / 
                                       sd(df$ssvep[df$lab == "Leipzig"])
+df$ssvepSNR_Z[df$lab == "Florida"] <- (df$ssvepSNR[df$lab == "Florida"] - mean(df$ssvepSNR[df$lab == "Florida"])) / 
+                                        sd(df$ssvepSNR[df$lab == "Florida"])
+df$ssvepSNR_Z[df$lab == "Leipzig"] <- (df$ssvepSNR[df$lab == "Leipzig"] - mean(df$ssvepSNR[df$lab == "Leipzig"])) / 
+                                        sd(df$ssvepSNR[df$lab == "Leipzig"])
 
 # save data frame in subflder for data frames
 savename = paste0(parentFolder,"/dataframes/dfSSVEP_commPL.csv")
@@ -363,6 +409,19 @@ topoAvgLE857sin <- rowMeans(topoMatLE857sin)
 topoAvgLE15sq <- rowMeans(topoMatLE15sq)
 topoAvgLE15sin <- rowMeans(topoMatLE15sin)
 
+topoAvgFL6sqSNR <- rowMeans(topoMatFL6sqSNR)
+topoAvgFL6sinSNR <- rowMeans(topoMatFL6sinSNR)
+topoAvgFL857sqSNR <- rowMeans(topoMatFL857sqSNR)
+topoAvgFL857sinSNR <- rowMeans(topoMatFL857sinSNR)
+topoAvgFL15sqSNR <- rowMeans(topoMatFL15sqSNR)
+topoAvgFL15sinSNR <- rowMeans(topoMatFL15sinSNR)
+topoAvgLE6sqSNR <- rowMeans(topoMatLE6sqSNR)
+topoAvgLE6sinSNR <- rowMeans(topoMatLE6sinSNR)
+topoAvgLE857sqSNR <- rowMeans(topoMatLE857sqSNR)
+topoAvgLE857sinSNR <- rowMeans(topoMatLE857sinSNR)
+topoAvgLE15sqSNR <- rowMeans(topoMatLE15sqSNR)
+topoAvgLE15sinSNR <- rowMeans(topoMatLE15sinSNR)
+
 # number of electrodes, separate for lab
 nrChansFL = length(topoAvgFL6sq)
 nrChansLE = length(topoAvgLE6sq)
@@ -382,7 +441,9 @@ dfTopos <- data.frame(
   x = c(rep(chanLocsFL$x, 6), rep(chanLocsLE$x, 6)),
   y = c(rep(chanLocsFL$y, 6), rep(chanLocsLE$y, 6)),
   amplitude = c(topoAvgFL6sq, topoAvgFL6sin, topoAvgFL857sq, topoAvgFL857sin, topoAvgFL15sq, topoAvgFL15sin,
-                topoAvgLE6sq, topoAvgLE6sin, topoAvgLE857sq, topoAvgLE857sin, topoAvgLE15sq, topoAvgLE15sin)
+                topoAvgLE6sq, topoAvgLE6sin, topoAvgLE857sq, topoAvgLE857sin, topoAvgLE15sq, topoAvgLE15sin),
+  amplitudeSNR = c(topoAvgFL6sqSNR, topoAvgFL6sinSNR, topoAvgFL857sqSNR, topoAvgFL857sinSNR, topoAvgFL15sqSNR, topoAvgFL15sinSNR,
+                   topoAvgLE6sqSNR, topoAvgLE6sinSNR, topoAvgLE857sqSNR, topoAvgLE857sinSNR, topoAvgLE15sqSNR, topoAvgLE15sinSNR)
 )
 
 # save topo dataframe
