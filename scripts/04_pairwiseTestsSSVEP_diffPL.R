@@ -2,7 +2,7 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
+# --- script version: December 2022
 # --- content: pairwise tests for ssVEP (different pipelines)
 
 
@@ -11,6 +11,7 @@
 # load required libraries
 library(here)
 library(tidyr)
+library(psych)
 library(rstatix)
 library(BayesFactor)
 
@@ -32,44 +33,74 @@ df$lab <- factor(df$lab, levels = c("Florida","Leipzig"), labels = c("Florida","
 df$freq <- factor(df$freq, levels = c("6Hz","8.57Hz","15Hz"), labels = c("6Hz","8.57Hz","15Hz"))
 df$mod = factor(df$mod, levels = c("square","sine"), labels = c("square","sine"))
 
+
 # create dfs to test main effects
 # average across mod conditions to test freq effects
 dfFreqEffects <- pivot_wider(data = df, id_cols = c(part,lab,freq), names_from = c(mod), values_from = c(ssvepZ))
-dfFreqEffects$ssvep <- rowMeans(dfFreqEffects[,c("square","sine")])
+dfFreqEffects$ssvepZ <- rowMeans(dfFreqEffects[,c("square","sine")])
 # average across freq conditions to test mod effects
 dfModEffects <- pivot_wider(data = df, id_cols = c(part,lab,mod), names_from = c(freq), values_from = c(ssvepZ))
-dfModEffects$ssvep <- rowMeans(dfModEffects[,c("6Hz","8.57Hz","15Hz")])
+dfModEffects$ssvepZ <- rowMeans(dfModEffects[,c("6Hz","8.57Hz","15Hz")])
+
+# create dfs for descriptive statistics of difference values
+dfDiff = data.frame(
+  lab = factor(c(rep("Florida",15),rep("Leipzig",15)), levels = c("Florida","Leipzig"),
+               labels = c("Florida","Leipzig")),
+  diff_6_857 = dfFreqEffects$ssvepZ[dfFreqEffects$freq == "6Hz"] - 
+               dfFreqEffects$ssvepZ[dfFreqEffects$freq == "8.57Hz"],
+  diff_6_15 = dfFreqEffects$ssvepZ[dfFreqEffects$freq == "6Hz"] - 
+              dfFreqEffects$ssvepZ[dfFreqEffects$freq == "15Hz"],
+  diff_857_15 = dfFreqEffects$ssvepZ[dfFreqEffects$freq == "8.57Hz"] - 
+                dfFreqEffects$ssvepZ[dfFreqEffects$freq == "15Hz"],
+  diff_sq_sin = dfModEffects$ssvepZ[dfModEffects$mod == "square"] - 
+                dfModEffects$ssvepZ[dfModEffects$mod == "sine"],
+  diff_sq_sin_6Hz = df$ssvepZ[df$mod == "square" & df$freq == "6Hz"] - 
+                    df$ssvepZ[df$mod == "sine" & df$freq == "6Hz"],
+  diff_sq_sin_857Hz = df$ssvepZ[df$mod == "square" & df$freq == "8.57Hz"] - 
+                    df$ssvepZ[df$mod == "sine" & df$freq == "8.57Hz"],
+  diff_sq_sin_15Hz = df$ssvepZ[df$mod == "square" & df$freq == "15Hz"] - 
+                    df$ssvepZ[df$mod == "sine" & df$freq == "15Hz"]
+)
+
+
+
+# Descriptive Statistics for Mean Differences + 95% Confidence Intervals --------
+descStats <- describeBy(dfDiff, group = dfDiff$lab)
+descStats$Florida$low.ci <- descStats$Florida$mean - qt(0.975,sum(dfDiff$lab == "Florida")-1)*descStats$Florida$se
+descStats$Florida$upp.ci <- descStats$Florida$mean + qt(0.975,sum(dfDiff$lab == "Florida")-1)*descStats$Florida$se
+descStats$Leipzig$low.ci <- descStats$Leipzig$mean - qt(0.975,sum(dfDiff$lab == "Leipzig")-1)*descStats$Leipzig$se
+descStats$Leipzig$upp.ci <- descStats$Leipzig$mean + qt(0.975,sum(dfDiff$lab == "Leipzig")-1)*descStats$Leipzig$se
+descStats
 
 
 
 # Pairwise Comparisons in Florida sample ----------------------------------
 # Frequentist t-tests, Cohen's d, and Bayesian t-tests
-
 # Main Effect Frequency Florida
-t_test(dfFreqEffects[dfFreqEffects$lab == "Florida",], ssvep ~ freq, paired = TRUE, p.adjust.method = "none")
-cohens_d(dfFreqEffects[dfFreqEffects$lab == "Florida",], ssvep ~ freq, paired = TRUE)
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "6Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "8.57Hz"],
+t_test(dfFreqEffects[dfFreqEffects$lab == "Florida",], ssvepZ ~ freq, paired = TRUE, p.adjust.method = "none")
+cohens_d(dfFreqEffects[dfFreqEffects$lab == "Florida",], ssvepZ ~ freq, paired = TRUE)
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "6Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "8.57Hz"],
         nullInterval = NULL, paired = TRUE);
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "6Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "15Hz"],
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "6Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "15Hz"],
         nullInterval = NULL, paired = TRUE);
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "8.57Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "15Hz"],
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "8.57Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Florida" & dfFreqEffects$freq == "15Hz"],
         nullInterval = NULL, paired = TRUE);
 
 # Main Effect Mod Florida
-t_test(dfModEffects[dfModEffects$lab == "Florida",], ssvep ~ mod, paired = TRUE, p.adjust.method = "none")
-cohens_d(dfModEffects[dfModEffects$lab == "Florida",], ssvep ~ mod, paired = TRUE)
-ttestBF(x = dfModEffects$ssvep[dfModEffects$lab == "Florida" & dfModEffects$mod == "square"],
-        y = dfModEffects$ssvep[dfModEffects$lab == "Florida" & dfModEffects$mod == "sine"],
+t_test(dfModEffects[dfModEffects$lab == "Florida",], ssvepZ ~ mod, paired = TRUE, p.adjust.method = "none")
+cohens_d(dfModEffects[dfModEffects$lab == "Florida",], ssvepZ ~ mod, paired = TRUE)
+ttestBF(x = dfModEffects$ssvepZ[dfModEffects$lab == "Florida" & dfModEffects$mod == "square"],
+        y = dfModEffects$ssvepZ[dfModEffects$lab == "Florida" & dfModEffects$mod == "sine"],
         nullInterval = NULL, paired = TRUE);
 
 # Mod effects for different frequencies (simple  effects)
 t_test(group_by(df[df$lab == "Florida",], freq),
-                ssvep ~ mod, paired = TRUE, p.adjust.method = "none")
+                ssvepZ ~ mod, paired = TRUE, p.adjust.method = "none")
 cohens_d(group_by(df[df$lab == "Florida",], freq),
-         ssvep ~ mod, paired = TRUE)
+         ssvepZ ~ mod, paired = TRUE)
 ttestBF(x = df$ssvepZ[df$lab == "Florida" & df$freq == "6Hz" & df$mod == "square"],
         y = df$ssvepZ[df$lab == "Florida" & df$freq == "6Hz" & df$mod == "sine"],
         nullInterval = NULL, paired = TRUE)
@@ -86,30 +117,30 @@ ttestBF(x = df$ssvepZ[df$lab == "Florida" & df$freq == "15Hz" & df$mod == "squar
 # Frequentist t-tests, Cohen's d, and Bayesian t-tests
 
 # Main Effect Frequency Leipzig
-t_test(dfFreqEffects[dfFreqEffects$lab == "Leipzig",], ssvep ~ freq, paired = TRUE, p.adjust.method = "none")
-cohens_d(dfFreqEffects[dfFreqEffects$lab == "Leipzig",], ssvep ~ freq, paired = TRUE)
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "6Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "8.57Hz"],
+t_test(dfFreqEffects[dfFreqEffects$lab == "Leipzig",], ssvepZ ~ freq, paired = TRUE, p.adjust.method = "none")
+cohens_d(dfFreqEffects[dfFreqEffects$lab == "Leipzig",], ssvepZ ~ freq, paired = TRUE)
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "6Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "8.57Hz"],
         nullInterval = NULL, paired = TRUE);
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "6Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "15Hz"],
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "6Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "15Hz"],
         nullInterval = NULL, paired = TRUE);
-ttestBF(x = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "8.57Hz"],
-        y = dfFreqEffects$ssvep[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "15Hz"],
+ttestBF(x = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "8.57Hz"],
+        y = dfFreqEffects$ssvepZ[dfFreqEffects$lab == "Leipzig" & dfFreqEffects$freq == "15Hz"],
         nullInterval = NULL, paired = TRUE);
 
 # Main Effect Mod Leipzig
-t_test(dfModEffects[dfModEffects$lab == "Leipzig",], ssvep ~ mod, paired = TRUE, p.adjust.method = "none")
-cohens_d(dfModEffects[dfModEffects$lab == "Leipzig",], ssvep ~ mod, paired = TRUE)
-ttestBF(x = dfModEffects$ssvep[dfModEffects$lab == "Leipzig" & dfModEffects$mod == "square"],
-        y = dfModEffects$ssvep[dfModEffects$lab == "Leipzig" & dfModEffects$mod == "sine"],
+t_test(dfModEffects[dfModEffects$lab == "Leipzig",], ssvepZ ~ mod, paired = TRUE, p.adjust.method = "none")
+cohens_d(dfModEffects[dfModEffects$lab == "Leipzig",], ssvepZ ~ mod, paired = TRUE)
+ttestBF(x = dfModEffects$ssvepZ[dfModEffects$lab == "Leipzig" & dfModEffects$mod == "square"],
+        y = dfModEffects$ssvepZ[dfModEffects$lab == "Leipzig" & dfModEffects$mod == "sine"],
         nullInterval = NULL, paired = TRUE);
 
 # Mod effects for different frequencies (simple effects)
 t_test(group_by(df[df$lab == "Leipzig",], freq),
-                ssvep ~ mod, paired = TRUE, p.adjust.method = "none")
+                ssvepZ ~ mod, paired = TRUE, p.adjust.method = "none")
 cohens_d(group_by(df[df$lab == "Leipzig",], freq),
-         ssvep ~ mod, paired = TRUE)
+         ssvepZ ~ mod, paired = TRUE)
 ttestBF(x = df$ssvepZ[df$lab == "Leipzig" & df$freq == "6Hz" & df$mod == "square"],
         y = df$ssvepZ[df$lab == "Leipzig" & df$freq == "6Hz" & df$mod == "sine"],
         nullInterval = NULL, paired = TRUE)
