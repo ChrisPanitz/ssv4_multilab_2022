@@ -2,8 +2,8 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
-# --- content: plotting topographies for different conditions (common pipeline)
+# --- script version: December 2022
+# --- content: plotting topographies for different conditions and labs (common pipeline)
 
 
 # Header Parameters -------------------------------------------------------
@@ -43,7 +43,8 @@ nrColors = 8
 loadname <- paste0(parentFolder, "/dataframes/dfTopos_commPL.csv")
 dfTopos <- read.csv(loadname, sep = ",")
 
-dfToposDiff <- pivot_wider(dfTopos, names_from = mod, values_from = amplitude)
+dfToposDiff <- pivot_wider(dfTopos, id_cols = c(lab,freq,electrode,x,y),
+                           names_from = mod, values_from = amplitude)
 dfToposDiff$amplitude = dfToposDiff$square - dfToposDiff$sine
 
 
@@ -201,18 +202,18 @@ toposLE <- ggarrange(topoLE6sq, topoLE6sin, topoLE6diff,
 
 
 # save plots
-savename = paste0(parentFolder,"/figures/17a_topos_commPL_Florida.pdf")
+savename = paste0(parentFolder,"/figures/17_topos_commPL_Florida.pdf")
 ggsave(filename = savename, plot = toposFL, device = "pdf",
        width = 21, height = 15, unit = "cm", limitsize = FALSE)
 
-savename = paste0(parentFolder,"/figures/17a_topos_commPL_Florida.jpg")
+savename = paste0(parentFolder,"/figures/17_topos_commPL_Florida.jpg")
 ggsave(filename = savename, plot = toposFL, device = "jpg",
        width = 21, height = 15, unit = "cm", limitsize = FALSE)
 
-savename = paste0(parentFolder,"/figures/17b_topos_commPL_Leipzig.pdf")
+savename = paste0(parentFolder,"/figures/17_topos_commPL_Leipzig.pdf")
 ggsave(filename = savename, plot = toposLE, device = "pdf",
        width = 21, height = 15, unit = "cm", dpi = 300, limitsize = FALSE)
 
-savename = paste0(parentFolder,"/figures/17b_topos_commPL_Leipzig.jpg")
+savename = paste0(parentFolder,"/figures/17_topos_commPL_Leipzig.jpg")
 ggsave(filename = savename, plot = toposLE, device = "jpg",
        width = 21, height = 15, unit = "cm", dpi = 300, limitsize = FALSE)
