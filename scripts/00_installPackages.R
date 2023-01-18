@@ -2,7 +2,7 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
+# --- script version: December 2022
 # --- content: installing required packages but only if not already installed
 
 if(!is.element("BayesFactor",installed.packages()[,1])) {install.packages("BayesFactor")}
@@ -17,3 +17,5 @@ if(!is.element("psych",installed.packages()[,1])) {install.packages("psych")}
 if(!is.element("RColorBrewer",installed.packages()[,1])) {install.packages("RColorBrewer")}
 if(!is.element("rstatix",installed.packages()[,1])) {install.packages("rstatix")}
 if(!is.element("tidyr",installed.packages()[,1])) {install.packages("tidyr")}
+if(!is.element("psych",installed.packages()[,1])) {install.packages("psych")}
+if(!is.element("doMC",installed.packages()[,1])) {install.packages("doMC")}
