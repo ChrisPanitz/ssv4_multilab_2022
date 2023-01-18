@@ -2,14 +2,14 @@
 # --- encoding: en_US.UTF-8
 # --- R version: 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 # --- RStudio version: 2022.02.3
-# --- script version: August 2022
-# --- content: plotting spectra for different conditions (common pipeline)
+# --- script version: December 2022
+# --- content: plotting spectra and topographies for different conditions (common pipeline)
 
 
 # Header Parameters -------------------------------------------------------
 
 xmin <- 4
-xmax <- 17
+xmax <- 31
 fType = "Helvetica"
 fSize = 9
 
@@ -54,15 +54,16 @@ resLE <- diff(dfSpectra$freqBin[dfSpectra$lab == "Leipzig"])[1]
 # Create bar plots with vertical, dashed line at driving frequency;
 # One plot per Site and Driving Frequency with the two modulation functions in each plot
 specFL6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "6Hz",], 
-                  aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                  aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "6Hz" & dfSpectra$mod == "square",], 
            width = resFL) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "6Hz" & dfSpectra$mod == "sine",],
-           width = resFL, alpha = .80) +
+           width = resFL, alpha = .50) +
   #geom_vline(xintercept = 6, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = "Spectral amplitude ([µV/rad^2] / Hz)", limits = c(yminFL,ymaxFL)) +
+  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = seq(6,xmax,6), labels = as.character(seq(6,xmax,6))) +
+  scale_y_continuous(name = "Normalized spectral amplitude\nof CSD([µV/rad^2] / Hz)", limits = c(yminFL,ymaxFL)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
   labs(title = "Florida - 6 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -81,15 +82,16 @@ specFL6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq =
   )
 
 specFL857 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "8.57Hz",], 
-                    aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                    aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "8.57Hz" & dfSpectra$mod == "square",],
            width = resFL) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "8.57Hz" & dfSpectra$mod == "sine",],
-           width = resFL, alpha = .80) +
+           width = resFL, alpha = .50) +
   #geom_vline(xintercept = 60/7, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = " ", limits = c(yminFL,ymaxFL)) +
+  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = seq(8.57,xmax,8.57), labels = as.character(seq(8.57,xmax,8.57))) +
+  scale_y_continuous(name = " \n ", limits = c(yminFL,ymaxFL)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Oranges")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "Oranges")[4:3], breaks = c("square","sine")) +
   labs(title = "Florida - 8.57 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -108,15 +110,16 @@ specFL857 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq
   )
 
 specFL15 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "15Hz",], 
-                   aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                   aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "15Hz" & dfSpectra$mod == "square",],
            width = resFL) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq == "15Hz" & dfSpectra$mod == "sine",],
-           width = resFL, alpha = .80) +
+           width = resFL, alpha = .50) +
   #geom_vline(xintercept = 15, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = " ", limits = c(yminFL,ymaxFL)) +
+  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = seq(15,xmax,15), labels = as.character(seq(15,xmax,15))) +
+  scale_y_continuous(name = " \n ", limits = c(yminFL,ymaxFL)) +
   scale_fill_manual(values = brewer.pal(n = 4, "BuGn")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "BuGn")[4:3], breaks = c("square","sine")) +
   labs(title = "Florida - 15 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -135,15 +138,16 @@ specFL15 <- ggplot(data = dfSpectra[dfSpectra$lab == "Florida" & dfSpectra$freq 
   )
 
 specLE6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "6Hz",], 
-                  aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                  aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "6Hz" & dfSpectra$mod == "square",],
            width = resLE) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "6Hz" & dfSpectra$mod == "sine",],
-           width = resLE, alpha = .80) +
+           width = resLE, alpha = .50) +
   #geom_vline(xintercept = 6, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = "Spectral amplitude ([µV/cm^2] / Hz)", limits = c(yminLE,ymaxLE)) +
+  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = seq(6,xmax,6), labels = as.character(seq(6,xmax,6))) +
+  scale_y_continuous(name = "Normalized spectral amplitude\nof CSD ([µV/cm^2] / Hz)", limits = c(yminLE,ymaxLE)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "Purples")[4:3], breaks = c("square","sine")) +
   labs(title = "Leipzig - 6 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -162,15 +166,16 @@ specLE6 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq =
   )
 
 specLE857 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "8.57Hz",], 
-                    aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                    aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "8.57Hz" & dfSpectra$mod == "square",],
            width = resLE) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "8.57Hz" & dfSpectra$mod == "sine",],
-           width = resLE, alpha = .80) +
+           width = resLE, alpha = .50) +
   #geom_vline(xintercept = 60/7, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = "Frequency (Hz)", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = " ", limits = c(yminLE,ymaxLE)) +
+  scale_x_continuous(name = "Frequency (Hz)", limits = c(xmin,xmax), breaks = seq(8.57,xmax,8.57), labels = as.character(seq(8.57,xmax,8.57))) +
+  scale_y_continuous(name = " \n ", limits = c(yminLE,ymaxLE)) +
   scale_fill_manual(values = brewer.pal(n = 4, "Oranges")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "Oranges")[4:3], breaks = c("square","sine")) +
   labs(title = "Leipzig - 8.57 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -189,15 +194,16 @@ specLE857 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq
   )
 
 specLE15 <- ggplot(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "15Hz",], 
-                   aes(x = freqBin, y = amp, fill = mod)) + theme_classic() +
+                   aes(x = freqBin, y = amp, fill = mod, color = mod)) + theme_classic() +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "15Hz" & dfSpectra$mod == "square",],
            width = resLE) +
   geom_col(data = dfSpectra[dfSpectra$lab == "Leipzig" & dfSpectra$freq == "15Hz" & dfSpectra$mod == "sine",],
-           width = resLE, alpha = .80) +
+           width = resLE, alpha = .50) +
   #geom_vline(xintercept = 15, color = "gray70", linetype = "dashed", size = .2) +
-  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = c(6,8.57,15), labels = c("6","8.57","15")) +
-  scale_y_continuous(name = " ", limits = c(yminLE,ymaxLE)) +
+  scale_x_continuous(name = " ", limits = c(xmin,xmax), breaks = seq(15,xmax,15), labels = as.character(seq(15,xmax,15))) +
+  scale_y_continuous(name = " \n ", limits = c(yminLE,ymaxLE)) +
   scale_fill_manual(values = brewer.pal(n = 4, "BuGn")[4:3], breaks = c("square","sine")) +
+  scale_color_manual(values = brewer.pal(n = 4, "BuGn")[4:3], breaks = c("square","sine")) +
   labs(title = "Leipzig - 15 Hz") +
   theme(
     plot.title = element_text(size = fSize, color = "black", face = "bold", hjust = .5),
@@ -230,6 +236,7 @@ dfTopos <- read.csv(loadname, sep = ",")
 
 # collapse topographical data across modulation functions
 dfTopos <- pivot_wider(data = dfTopos,
+                       id_cols = c(lab, freq, electrode, x, y),
                        names_from = mod,
                        values_from = amplitude
 )
@@ -243,6 +250,9 @@ topoFL6 <- topoplot(data = dfTopos[dfTopos$lab == "Florida" & dfTopos$freq == "6
   geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "6Hz" & dfTopos$electrode == "E75"],
                  y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "6Hz" & dfTopos$electrode == "E75"]),
              color = chanCol, size = .25) +
+  geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"],
+                 y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"]),
+             color = chanCol, size = .25) +
   theme(legend.position = "none")
 topoFL6$data$fill <- as.numeric(bin(data = topoFL6$data$fill, nbins = nrColors))
 topoFL6$layers <- topoFL6$layers[-c(3,4,5)]
@@ -254,6 +264,9 @@ topoFL857 <- topoplot(data = dfTopos[dfTopos$lab == "Florida" & dfTopos$freq == 
   geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "8.57Hz" & dfTopos$electrode == "E75"],
                  y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "8.57Hz" & dfTopos$electrode == "E75"]),
              color = chanCol, size = .25) +
+  geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"],
+                 y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"]),
+             color = chanCol, size = .25) +
   theme(legend.position = "none")
 topoFL857$data$fill <- as.numeric(bin(data = topoFL857$data$fill, nbins = nrColors))
 topoFL857$layers <- topoFL857$layers[-c(3,4,5)]
@@ -264,6 +277,9 @@ topoFL15 <- topoplot(data = dfTopos[dfTopos$lab == "Florida" & dfTopos$freq == "
   geom_head(size = rel(1.5)*.10, color = "gray70") +
   geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E75"],
                  y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E75"]),
+             color = chanCol, size = .25) +
+  geom_point(aes(x = dfTopos$x[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"],
+                 y = dfTopos$y[dfTopos$lab == "Florida" & dfTopos$freq == "15Hz" & dfTopos$electrode == "E81"]),
              color = chanCol, size = .25) +
   theme(legend.position = "none")
 topoFL15$data$fill <- as.numeric(bin(data = topoFL15$data$fill, nbins = nrColors))
